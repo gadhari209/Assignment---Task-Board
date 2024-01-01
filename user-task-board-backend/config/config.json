@@ -1,0 +1,22 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "mol@209",
+    "database": "task_board_db",
+    "host": "127.0.0.1",
+    "dialect": "postgres"},
+  "test": {
+    "username": "postgres",
+    "password": "mol@209",
+    "database": "task_board_db",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "mol@209",
+    "database": "task_board_db",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}

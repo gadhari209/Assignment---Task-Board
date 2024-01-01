@@ -1,0 +1,29 @@
+/* src/components/TaskBoard.css */
+
+.task-board-container {
+    display: flex;
+    overflow-x: auto;
+  }
+  
+  .list-container {
+    display: inline-block;
+    margin-right: 20px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    min-width: 200px;
+  }
+  
+  .list-container h3 {
+    margin-bottom: 10px;
+  }
+  
+  .list-container ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .list-container li {
+    margin-bottom: 5px;
+  }
+  
