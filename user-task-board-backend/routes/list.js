@@ -4,7 +4,7 @@ const sequelize = require('../models/index').sequelize;
 const { List, Task, User } = require('../models');
 const router = express.Router();
 
-// Create a new task list
+
 // Create a new task list
 router.post('/lists', async (req, res) => {
   try {
@@ -22,6 +22,7 @@ router.post('/lists', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 router.delete('/tasks/:taskId', async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -97,7 +98,7 @@ router.put('/tasks/:taskId/move', async (req, res) => {
   }
 });
 
-//http://localhost:3001/api/lists/tasks/:taskId/move
+
 
 //retrieve all task lists
 router.get('/lists', async (req, res) => {
