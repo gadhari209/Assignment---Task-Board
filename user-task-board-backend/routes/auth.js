@@ -35,4 +35,42 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/register', async (req, res) => {
+  try {
+    const { name, password } = req.body;
+
+    // Check if name and password are provided
+    if (!name || !password) {
+      return res.status(400).json({ error: 'Name and password are required' });
+    }
+
+    // Check if the user with the provided name already exists
+    const existingUser = await User.findOne({ where: { username: name } });
+    if (existingUser) {
+      return res.status(409).json({ error: 'User with this name already exists' });
+    }
+
+    // Create a new user
+    const newUser = await User.create({
+      username: name,
+      password: password,
+      // Add more user-related information as needed
+    });
+
+    // Include additional user information in the response
+    const responseData = {
+      userId: newUser.id,
+      username: newUser.username,
+      // Add more user-related information as needed
+    };
+
+    // Send the user information in the response
+    res.status(201).json(responseData);
+  } catch (error) {
+    console.error('Error during registration:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 module.exports = router;

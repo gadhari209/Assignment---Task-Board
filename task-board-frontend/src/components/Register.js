@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const Register = ({ onRegister }) => {
-  const [userId, setUserId] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -14,7 +15,10 @@ const Register = ({ onRegister }) => {
         return;
       }
 
-      const response = await axios.post('http://localhost:3001/api/auth/register', { userId, password });
+      const response = await axios.post('http://localhost:3001/api/auth/register', {
+        name,
+        password,
+      });
 
       // Assuming your backend sends a user object with userId and other details
       const user = response.data;
@@ -22,8 +26,15 @@ const Register = ({ onRegister }) => {
       // Store the user object in localStorage
       localStorage.setItem('user', JSON.stringify(user));
 
+      // Display SweetAlert with user information
+      Swal.fire({
+        icon: 'success',
+        title: 'Registration Successful!',
+        html: `User ID: ${user.userId}<br/>Username: ${user.username}`,
+      });
+
       // Call onRegister callback to update the state in the parent component
-      onRegister();
+      onRegister(user.userId); // Pass the user ID to the parent component
     } catch (err) {
       setError('Error registering user. Please try again.');
     }
@@ -35,9 +46,9 @@ const Register = ({ onRegister }) => {
       <div style={styles.inputContainer}>
         <input
           type="text"
-          placeholder="User ID"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           style={styles.input}
         />
         <input
@@ -103,5 +114,3 @@ const styles = {
 };
 
 export default Register;
-
-

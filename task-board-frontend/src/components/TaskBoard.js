@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import Swal from 'sweetalert2';
 
 const TaskBoard = () => {
   const [lists, setLists] = useState([]);
@@ -9,7 +10,15 @@ const TaskBoard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/lists/user/1/lists');
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const userId = userData ? userData.userId : null;
+
+        if (!userId) {
+          console.error('User ID is not available');
+          return;
+        }
+
+        const response = await axios.get(`http://localhost:3001/api/lists/user/${userId}/lists`);
         setLists(response.data.Lists);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -67,12 +76,35 @@ const TaskBoard = () => {
 
   const handleTaskDelete = async (taskId) => {
     try {
-      // Make API call to delete the task
-      await axios.delete(`http://localhost:3001/api/lists/tasks/${taskId}`);
+      // Use SweetAlert for confirmation
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'You will not be able to recover this task!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, keep it',
+      });
 
-      // Fetch updated data after deletion
-      const response = await axios.get('http://localhost:3001/api/lists/user/1/lists');
-      setLists(response.data.Lists);
+      if (result.isConfirmed) {
+        // Make API call to delete the task
+        await axios.delete(`http://localhost:3001/api/lists/tasks/${taskId}`);
+
+        // Fetch updated data after deletion
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const userId = userData ? userData.userId : null;
+
+        if (!userId) {
+          console.error('User ID is not available');
+          return;
+        }
+
+        const response = await axios.get(`http://localhost:3001/api/lists/user/${userId}/lists`);
+        setLists(response.data.Lists);
+
+        // Show success message
+        Swal.fire('Deleted!', 'Your task has been deleted.', 'success');
+      }
     } catch (error) {
       console.error('Error deleting task:', error);
     }
@@ -191,12 +223,15 @@ const TaskBoard = () => {
                           {...provided.dragHandleProps}
                           style={styles.task}
                         >
-                          <button onClick={() => handleTaskDelete(task.id)} style={styles.checkbox}>
-                            Mark Done
+                          <button onClick={() => handleTaskCheckboxChange(task.id)} style={styles.checkbox}>
+                            {task.completed ? 'Undo' : 'Complete'}
                           </button>
                           <span style={{ ...styles.taskText, textDecoration: task.completed ? 'line-through' : 'none' }}>
                             {task.description}
                           </span>
+                          <button onClick={() => handleTaskDelete(task.id)} style={styles.checkbox}>
+                            Delete
+                          </button>
                         </div>
                       )}
                     </Draggable>
@@ -211,7 +246,7 @@ const TaskBoard = () => {
                     style={styles.addTaskInput}
                   />
                   <button onClick={() => handleAddTask(list.id)} style={styles.addButton}>
-                    Add 
+                    Add
                   </button>
                 </div>
                 {provided.placeholder}

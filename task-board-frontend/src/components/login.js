@@ -1,26 +1,35 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Register from './Register'; // Import the Register component
 
 const Login = ({ onLogin }) => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false); // New state for registration mode
 
   const handleLogin = async () => {
     try {
       const response = await axios.post('http://localhost:3001/api/auth/login', { userId, password });
-
-      // Assuming your backend sends a user object with userId and other details
       const user = response.data;
-
-      // Store the user object in localStorage
       localStorage.setItem('user', JSON.stringify(user));
-
-      // Call onLogin callback to update the state in the parent component
       onLogin();
     } catch (err) {
       setError('Invalid credentials. Please try again.');
     }
+  };
+
+  const handleRegister = () => {
+    setIsRegistering(true);
+  };
+
+  const handleBackToLogin = () => {
+    setIsRegistering(false);
+  };
+
+  const onRegister = () => {
+    // You can add any logic you need after successful registration
+    setIsRegistering(false); // Switch back to login mode
   };
 
   return (
@@ -29,26 +38,35 @@ const Login = ({ onLogin }) => {
         <h1 style={styles.navHeading}>Welcome to Task Board Assignment</h1>
       </nav>
       <div style={styles.container}>
-        <h2 style={styles.heading}>Login</h2>
-        <div style={styles.inputContainer}>
-          <input
-            type="text"
-            placeholder="User ID"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            style={styles.input}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={styles.input}
-          />
-        </div>
-        <button onClick={handleLogin} style={styles.button}>
-          Login
-        </button>
+        {isRegistering ? ( // Conditional rendering for registration form
+          <Register onRegister={onRegister} />
+        ) : (
+          <>
+            <h2 style={styles.heading}>Login</h2>
+            <div style={styles.inputContainer}>
+              <input
+                type="text"
+                placeholder="User ID"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                style={styles.input}
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={styles.input}
+              />
+            </div>
+            <button onClick={handleLogin} style={styles.button}>
+              Login
+            </button>
+            <p style={{ textAlign: 'center', marginTop: '10px' }}>
+              Don't have an account? <button onClick={handleRegister}>Register</button>
+            </p>
+          </>
+        )}
         {error && <p style={{ color: '#FF4500', marginTop: '10px' }}>{error}</p>}
       </div>
     </div>
